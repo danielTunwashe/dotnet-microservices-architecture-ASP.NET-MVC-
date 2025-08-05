@@ -16,13 +16,13 @@ public class CouponController : Controller
     }
     public async Task<IActionResult> CouponIndex()
     {
-        List<Coupon>? list = new();
+        IEnumerable<Coupon>? list = new List<Coupon>();
 
         ResponseDto? response = await _couponService.GetAllCouponsAsync();
 
         if(response != null && response.IsSuccess)
         {
-            list = JsonConvert.DeserializeObject<List<Coupon>>(JsonConvert.SerializeObject(response.Result));
+            list = JsonConvert.DeserializeObject<IEnumerable<Coupon>>(JsonConvert.SerializeObject(response.Result));
         }
         else
         {
@@ -34,7 +34,7 @@ public class CouponController : Controller
             return View(list);
     }
 
-
+    //shows the form when the page loads....
     public async Task<IActionResult> CouponCreate()
     {
         return View();
@@ -113,7 +113,7 @@ public class CouponController : Controller
             TempData["error"] = response?.Message;
         }
 
-        return NotFound();
+        return View();
     }
 
     [HttpPost]
