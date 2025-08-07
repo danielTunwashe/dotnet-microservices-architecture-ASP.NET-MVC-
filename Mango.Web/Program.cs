@@ -1,6 +1,7 @@
 using Mango.Web.Service;
 using Mango.Web.Service.IService;
 using Mango.Web.Utility;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,16 +12,27 @@ builder.Services.AddControllersWithViews();
 //Registers the IHTTPContextFactory that we are using in our base class
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-//Then register our coupon service via httpclient
+
+//Then register our coupon service(and other services) to httpclient
 builder.Services.AddHttpClient<ICouponService,CouponService>();
+builder.Services.AddHttpClient<IAuthService,AuthService>();
 //Set the value of CouponAPIBase from the URL in the appsetting in the web project from the api launch settings.js
 SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
+SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
 
 
 //Register the Base service and coupon service to dependency injection
 builder.Services.AddScoped<IBaseService,BaseService>();
 builder.Services.AddScoped<ICouponService,CouponService>();
-
+builder.Services.AddScoped<IAuthService,AuthService>();
+builder.Services.AddScoped<ITokenProvider,TokenProvider>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromHours(10);
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,7 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
