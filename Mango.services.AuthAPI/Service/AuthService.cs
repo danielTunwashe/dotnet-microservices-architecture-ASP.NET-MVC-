@@ -57,7 +57,9 @@ public class AuthService : IAuthService
         }
 
         //If the user is valid then we need to generate a token for them
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        //get the roles associated with a particular user..
+        var roles = await _userManager.GetRolesAsync(user);
+        var token = _jwtTokenGenerator.GenerateToken(user,roles);
 
         UserDto userDto = new UserDto()
         {

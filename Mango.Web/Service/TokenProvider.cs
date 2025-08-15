@@ -1,6 +1,6 @@
 ﻿using Mango.Web.Service.IService;
 using Mango.Web.Utility;
-using Newtonsoft.Json.Linq;
+
 
 namespace Mango.Web.Service;
 
@@ -26,7 +26,6 @@ public class TokenProvider : ITokenProvider
 
     public void SetToken(string token)
     {
-
         _contextAccessor.HttpContext?.Response.Cookies.Append(SD.TokenCookie, token);
     }
 }

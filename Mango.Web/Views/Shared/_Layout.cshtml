@@ -34,6 +34,15 @@
                             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                                 <li><a class="dropdown-item" asp-controller="Coupon" asp-action="CouponIndex">Coupon</a></li>
                             </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Product Management
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                                <li><a class="dropdown-item" asp-controller="Product" asp-action="ProductIndex">Product</a></li>
+                            </ul>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (!User.Identity.IsAuthenticated)
@@ -47,6 +56,9 @@
                         }
                         else
                         {
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Hello @User.Identity.Name</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link " asp-controller="Auth" asp-action="Logout">Logout</a>
                             </li>

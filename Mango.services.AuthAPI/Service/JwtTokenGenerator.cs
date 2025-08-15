@@ -17,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _jwtOptions = jwtOptions.Value;
     }
 
-    public string GenerateToken(ApplicationUser applicationUser)
+    public string GenerateToken(ApplicationUser applicationUser, IEnumerable<string> roles)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -26,20 +26,25 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
 
         // we have the claim list
-        var claims = new List<Claim>
+        var claimList = new List<Claim>
         {   //Compulsory three claims that should be stored in JWT token
             new Claim(JwtRegisteredClaimNames.Email, applicationUser.Email),
             new Claim(JwtRegisteredClaimNames.Sub, applicationUser.Id),
-            new Claim(ClaimTypes.Name, applicationUser.UserName.ToString())
+            new Claim(JwtRegisteredClaimNames.Name, applicationUser.UserName),
         };
+
+
+        //Adding the roles of the particular user..
+        claimList.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
 
         //We need a token descriptor
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Audience = _jwtOptions.Audience,
             Issuer = _jwtOptions.Issuer,
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7), // Token will be valid for 7 days
+            Subject = new ClaimsIdentity(claimList),
+            Expires = DateTime.UtcNow.AddMinutes(1), // Token will be valid for 7 days
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

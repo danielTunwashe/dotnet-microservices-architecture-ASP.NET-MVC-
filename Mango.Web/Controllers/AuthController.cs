@@ -51,9 +51,14 @@ public class AuthController : Controller
             //redirect to the index action of the home controller..
             return RedirectToAction("Index", "Home");
         }
+        //else
+        //{
+        //    ModelState.AddModelError("CustomError", responseDto.Message);
+        //    return View(loginRequestDto);
+        //}
         else
         {
-            ModelState.AddModelError("CustomError", responseDto.Message);
+            TempData["error"] = responseDto?.Message;
             return View(loginRequestDto);
         }
 
@@ -141,7 +146,11 @@ public class AuthController : Controller
 
         //must add this claim also..
         identity.AddClaim(new Claim(ClaimTypes.Name,
-            jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name).Value));
+            jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+
+        //Extracting role claims in the jwt 
+        identity.AddClaim(new Claim(ClaimTypes.Role,
+            jwt.Claims.FirstOrDefault(u => u.Type == "role").Value));
 
 
         var principal = new ClaimsPrincipal(identity);
