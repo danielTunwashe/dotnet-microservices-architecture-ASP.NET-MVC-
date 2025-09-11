@@ -44,7 +44,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             Audience = _jwtOptions.Audience,
             Issuer = _jwtOptions.Issuer,
             Subject = new ClaimsIdentity(claimList),
-            Expires = DateTime.UtcNow.AddMinutes(1), // Token will be valid for 7 days
+            Expires = DateTime.UtcNow.AddMinutes(7), // Token will be valid for 7 days
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

@@ -9,7 +9,7 @@ using Mango.Services.ProductAPI.Products.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 
 namespace Mango.Services.ProductAPI.Controllers;
 
@@ -44,7 +44,7 @@ public class ProductAPIController : ControllerBase
         return Ok(_response);
     }
 
-    [Authorize]
+
     [HttpGet("GetAll")]
     public async Task<ActionResult<IEnumerable<ProductResponseDto?>>> GetAll()
     {
@@ -64,7 +64,6 @@ public class ProductAPIController : ControllerBase
 
     }
 
-    [Authorize]
     [HttpGet("GetById/{id}")]
     public async Task<ActionResult<IEnumerable<ProductResponseDto?>>> GetById([FromRoute] int id)
     {
@@ -122,7 +121,4 @@ public class ProductAPIController : ControllerBase
         _response.Message = "Product deleted successfully..";
         return Ok(_response);
     }
-
-
-
 }
