@@ -19,12 +19,14 @@ builder.Services.AddHttpClient<IAuthService,AuthService>();
 builder.Services.AddHttpClient<IProductService,ProductService>();
 builder.Services.AddHttpClient<ICartService,CartService>();
 builder.Services.AddHttpClient<IOrderService,OrderService>();
+builder.Services.AddHttpClient<IEmailService,EmailService>();
 //Set the value of CouponAPIBase from the URL in the appsetting in the web project from the api launch settings.js
 SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
 SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
 SD.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
 SD.ShoppingCartAPIBase = builder.Configuration["ServiceUrls:ShoppingCartAPI"];
 SD.OrderAPIBase = builder.Configuration["ServiceUrls:OrderAPI"];
+SD.EmailAPIBase = builder.Configuration["ServiceUrls:EmailAPI"];
 
 
 //Register the Base service and coupon service to dependency injection
@@ -34,6 +36,7 @@ builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<IProductService,ProductService>();
 builder.Services.AddScoped<ICartService,CartService>();
 builder.Services.AddScoped<IOrderService,OrderService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<ITokenProvider,TokenProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

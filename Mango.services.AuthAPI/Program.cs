@@ -1,3 +1,4 @@
+using Mango.services.AuthAPI.Application;
 using Mango.services.AuthAPI.Data;
 using Mango.services.AuthAPI.Models;
 using Mango.services.AuthAPI.Service;
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Bind the JWT Configuration to the JWTOptions model with the help of the DI
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
+
+builder.Services.AddAutoMapper(typeof(UserProfile));
 
 //Tell entity frameworkcore that we will be using the .netidentity and will be uisng
 //entity framework core where we have the .net identity

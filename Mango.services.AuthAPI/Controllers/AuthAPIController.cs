@@ -60,5 +60,21 @@ namespace Mango.services.AuthAPI.Controllers
             }
             return Ok(_response);
         }
+
+        [HttpGet("GetUserById")]
+        public async Task<IActionResult> GetUserById([FromBody] GetUserByIdInput input)
+        {
+            var usergotten = await _authService.GetUserById(input);
+
+            if (usergotten.User == null)
+            {
+                _response.IsSuccess = false;
+                _response.Message = "User Not Found";
+                return BadRequest(_response);
+            }
+
+            _response.Result = usergotten;
+            return Ok(_response);
+        }
     }
 }

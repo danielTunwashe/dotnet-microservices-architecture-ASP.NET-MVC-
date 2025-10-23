@@ -1,5 +1,6 @@
-using Mango.Services.ProductAPI.Models;
+﻿using Mango.Services.ProductAPI.Models;
 using Mango.Web.Models;
+using Mango.Web.Models.AuthApiModels;
 using Mango.Web.Models.ProductAPI;
 using Mango.Web.Models.ShoppingCartAPI;
 using Mango.Web.Service.IService;
@@ -16,12 +17,14 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly IProductService _productService;
     private readonly ICartService _cartService;
+    private readonly IAuthService _authService;
 
-    public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService)
+    public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService, IAuthService authService)
     {
         _logger = logger;
         _productService = productService;
         _cartService = cartService;
+        _authService = authService;
     }
 
     public async Task<IActionResult> Index()
@@ -67,39 +70,83 @@ public class HomeController : Controller
     [ActionName("ProductDetails")]
     public async Task<IActionResult> ProductDetails(ProductResponseDto productResponseDto)
     {
-        CartDto cartDto = new CartDto()
+        try
         {
-            CartHeader = new CartHeaderDto
+            // ✅ Stage 1: Validate incoming DTO
+            if (productResponseDto == null)
             {
-                UserId = User.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub)?.Value
-            },
-           
-        };
+                TempData["error"] = "Invalid product data.";
+                return View(productResponseDto);
+            }
 
-        CartDetailsDto cartDetails = new CartDetailsDto()
-        {
-            Count = productResponseDto.Count,
-            ProductId = productResponseDto.ProductId,
-        };
+            if (productResponseDto.ProductId <= 0 || productResponseDto.Count <= 0)
+            {
+                TempData["error"] = "Invalid product selection or count.";
+                return View(productResponseDto);
+            }
 
-        List<CartDetailsDto> cartDetailsDto = new() { cartDetails };
+            // Extract logged-in user
+            var userId = User.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["error"] = "User not authenticated.";
+                return RedirectToAction("Login", "Account");
+            }
 
-        cartDto.CartDetails = cartDetailsDto;
+            var input = new GetUserByIdInput
+            {
+                UserId = userId,
+            };
 
-        ResponseDto? response = await _cartService.UpsertCartAsync(cartDto);
+            var userDetails = await _authService.GetUserByIdAsync(input);
+            var userDetailsResult =  JsonConvert.DeserializeObject<GetUserByIdOutput>(JsonConvert.SerializeObject(userDetails.Result));
 
+            if(userDetailsResult.User == null)
+            {
+                throw new Exception("User Not found.. (API returns null..)");
+            }
 
+            // Build cart DTO
+            CartDto cartDto = new CartDto
+            {
+                CartHeader = new CartHeaderDto { UserId = userId,Name = userDetailsResult.User.Name, Email = userDetailsResult.User.Email, Phone = userDetailsResult.User.PhoneNumber },
+                CartDetails = new List<CartDetailsDto>
+            {
+                new CartDetailsDto
+                {
+                    Count = productResponseDto.Count,
+                    ProductId = productResponseDto.ProductId
+                }
+            }  };
 
-        if (response.Result != null && response.IsSuccess)
-        {
-            TempData["success"] = "Item has been added to the shopping cart";
-            return RedirectToAction(nameof(Index));
+            // Call service
+            ResponseDto response = await _cartService.UpsertCartAsync(cartDto);
+            var responseResult = JsonConvert.DeserializeObject<CartDto>(JsonConvert.SerializeObject(response.Result));
+
+            if (response == null)
+            {
+                TempData["error"] = "Unexpected error: cart service returned null.";
+                return View(productResponseDto);
+            }
+
+            // Handle service response
+            if (response.IsSuccess && response.Result != null)
+            {
+                TempData["success"] = "Item has been added to the shopping cart";
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                TempData["error"] = response.Message ?? "Failed to update cart.";
+                return View(productResponseDto);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            TempData["error"] = response?.Message;
+            // Unexpected exception handling
+            TempData["error"] = $"An unexpected error occurred: {ex.Message}";
+            return View(productResponseDto);
         }
-        return View(productResponseDto);
     }
 
     public IActionResult Privacy()

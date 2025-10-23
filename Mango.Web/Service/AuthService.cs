@@ -23,6 +23,16 @@ public class AuthService : IAuthService
         });
     }
 
+    public async Task<ResponseDto?> GetUserByIdAsync(GetUserByIdInput input)
+    {
+        return await _baseService.SendAsync(new RequestDto
+        {
+            ApiType = SD.ApiType.GET,
+            Data = input,
+            Url = SD.AuthAPIBase + "/api/auth/GetUserById"
+        }, withBearer: false);
+    }
+
     public async Task<ResponseDto?> LoginAsync(LoginRequestDto loginRequestDto)
     {
         return await _baseService.SendAsync(new RequestDto

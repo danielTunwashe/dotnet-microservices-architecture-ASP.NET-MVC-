@@ -8,4 +8,5 @@ public interface IAuthService
     Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto);
 
     Task<bool> AssignRole(string email, string roleName);
+    Task<GetUserByIdOutput> GetUserById(GetUserByIdInput input);
 }

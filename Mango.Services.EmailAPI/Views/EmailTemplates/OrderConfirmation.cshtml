@@ -1,0 +1,55 @@
+﻿@using Mango.Services.EmailAPI.Models.Dto
+@model OrderEmailRequest
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f39c12; padding: 10px; color: #fff; text-align: center; }
+        .order-summary { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #999; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Thank you for your order, @Model.Name!</h2>
+        </div>
+
+        <p>Your order <strong>#@Model.OrderHeaderId</strong> has been placed successfully.</p>
+
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.Count</td>
+                            <td>@item.Price.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><strong>Total: @Model.OrderTotal.ToString("C")</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>Mango.Web &copy; @DateTime.Now.Year - All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

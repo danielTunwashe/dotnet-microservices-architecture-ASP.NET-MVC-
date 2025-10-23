@@ -1,0 +1,11 @@
+﻿@using Mango.Web.Models.ShoppingCartAPI
+@model ConfirmationInput
+<div class="text-center">
+    <h1 class="text-info pt-4">Congratulations! You are one step closer to amazing food</h1>
+
+    <p class="pb-3">We recieved your order and we will be ready in 30minutes during regular business hours!</p>
+    <h4 class="text-warning pb-3">Order ID - @Model.OrderId</h4>
+    <h4 class="text-warning pb-3">Reference - @Model.Reference</h4>
+
+    <img src="/images/order.PNG" width="80%"/>
+</div>

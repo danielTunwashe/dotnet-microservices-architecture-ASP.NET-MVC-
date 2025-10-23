@@ -1,4 +1,5 @@
-﻿using Mango.services.AuthAPI.Data;
+﻿using AutoMapper;
+using Mango.services.AuthAPI.Data;
 using Mango.services.AuthAPI.Models;
 using Mango.services.AuthAPI.Models.Dto;
 using Mango.services.AuthAPI.Service.IService;
@@ -13,14 +14,16 @@ public class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IMapper _mapper;
 
 
-    public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
+    public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator, IMapper mapper)
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _roleManager = roleManager;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _mapper = mapper;
     }
 
     public async Task<bool> AssignRole(string email, string roleName)
@@ -42,6 +45,23 @@ public class AuthService : IAuthService
         }
         return false;
         
+    }
+
+    public async Task<GetUserByIdOutput> GetUserById(GetUserByIdInput input)
+    {
+        var user = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == input.UserId);
+
+        if (user == null)
+        {
+            throw new Exception("User Not Found..");
+        }
+
+        var userDto = _mapper.Map<UserDto>(user);
+
+        return new GetUserByIdOutput
+        {
+            User = userDto
+        };
     }
 
     public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)

@@ -24,6 +24,7 @@ public class ProductController : Controller
 
         ResponseDto? response = await _productService.GetAll();
 
+
         if (response != null && response.IsSuccess)
         {
             product = JsonConvert.DeserializeObject<IEnumerable<Product>>(JsonConvert.SerializeObject(response.Result));

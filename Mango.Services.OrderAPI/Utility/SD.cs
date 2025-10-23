@@ -8,6 +8,10 @@ public class SD
     public const string Status_Completed = "Completed";
     public const string Status_Refunded = "Refunded";
     public const string Status_Cancelled = "Cancelled";
+    
+    
+    public const string charge_success = "charge.success";
+    public const string charge_failed = "charge.failed";
 
 
     public const string Role_Admin = "ADMIN";

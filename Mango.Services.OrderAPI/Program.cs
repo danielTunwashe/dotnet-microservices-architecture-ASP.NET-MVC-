@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var applicationAssembly = Assembly.GetExecutingAssembly();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 //This helps when we are calling another endpoint within our service and we want to pass the access token
@@ -32,6 +33,11 @@ builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
 //Bearer token we pass to the other api been called..
 builder.Services.AddHttpClient("Product", u => u.BaseAddress =
  new Uri(builder.Configuration["ServiceUrls:ProductAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
+
+builder.Services.AddHttpClient("Email", u => u.BaseAddress =
+ new Uri(builder.Configuration["ServiceUrls:EmailAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
+
+
 
 
 

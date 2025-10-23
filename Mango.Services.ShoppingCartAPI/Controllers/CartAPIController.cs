@@ -77,7 +77,7 @@ public class CartAPIController : ControllerBase
             {
                 CartHeader = _mapper.Map<CartHeaderDto>(_context.cartHeaders.First(u => u.UserId == userId))
             };
-            cart.CartDetails = _mapper.Map<IEnumerable<CartDetailsDto>>(_context.cartDetails
+            cart.CartDetails = _mapper.Map<List<CartDetailsDto>>(_context.cartDetails
                 .Where(u => u.CartHeaderId == cart.CartHeader.CartHeaderId));
 
             IEnumerable<ProductResponseDto> productResponseDto = await _productService.GetProducts();
@@ -118,14 +118,21 @@ public class CartAPIController : ControllerBase
             var cartHeaderFromDb = await _context.cartHeaders.AsNoTracking().FirstOrDefaultAsync(ch => ch.UserId == cartDto.CartHeader.UserId);
             if (cartHeaderFromDb == null)
             {
-                //create cart header and details
-                CartHeader cartHeader = _mapper.Map<CartHeader>(cartDto.CartHeader);
-                _context.cartHeaders.Add(cartHeader);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    //create cart header and details
+                    CartHeader cartHeader = _mapper.Map<CartHeader>(cartDto.CartHeader);
+                    await _context.cartHeaders.AddAsync(cartHeader);
+                    await _context.SaveChangesAsync();
 
-                cartDto.CartDetails.First().CartHeaderId = cartHeader.CartHeaderId;
-                _context.cartDetails.Add(_mapper.Map<CartDetails>(cartDto.CartDetails.First()));
-                await _context.SaveChangesAsync();
+                    cartDto.CartDetails.First().CartHeaderId = cartHeader.CartHeaderId;
+                    await _context.cartDetails.AddAsync(_mapper.Map<CartDetails>(cartDto.CartDetails.First()));
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    _response.Message = $"{ex.Message}";
+                }
             }
             else
             {
@@ -139,7 +146,7 @@ public class CartAPIController : ControllerBase
                 {
                     //create cartDetails
                     cartDto.CartDetails.First().CartHeaderId= cartHeaderFromDb.CartHeaderId;
-                    _context.cartDetails.Add(_mapper.Map <CartDetails>(cartDto.CartDetails.First()));
+                    await _context.cartDetails.AddAsync(_mapper.Map <CartDetails>(cartDto.CartDetails.First()));
                     await _context.SaveChangesAsync();
                 }
                 else
