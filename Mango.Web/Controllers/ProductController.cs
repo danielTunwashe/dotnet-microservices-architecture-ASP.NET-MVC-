@@ -60,7 +60,6 @@ public class ProductController : Controller
     }
 
 
-
     [HttpPost]
     public async Task<IActionResult> ProductUpdate(UpdateProductRequestDto updateProduct)
     {
@@ -77,6 +76,4 @@ public class ProductController : Controller
         }
         return NoContent();
     }
-
-
 }
